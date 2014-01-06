@@ -58,6 +58,6 @@ gmake
 If you found this helpful PLEASE support my work.
 
 (NOTE :These are clintar's addresses. I only ported to linux)
-XPM: AHCMBdHFTvJACJMMQhxYTpZLobZJLreTRk
+XPM: AGWshdugRrRBXwR63Eqs3sgdcMiZV3koJE
 
 BTC: 1P4yWhXx7FKtWiGJYZuX5CNEm126iSFuZg
