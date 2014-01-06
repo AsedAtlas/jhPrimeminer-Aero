@@ -657,7 +657,7 @@ static bool doSubmitBlock(primecoinBlock_t* block, unsigned int nChainLength, mp
 	primeStats.chainTotals[nCandidateType]++;
     primeStats.nChainHit++;
 
-	block->mpzPrimeChainMultiplier = mpzFixedMultiplier * nTriedMultiplier;
+	block->mpzPrimeChainMultiplier = mpzFixedMultiplier * (double) nTriedMultiplier;
 	block->serverData.client_shareBits = nProbableChainLength;
     // generate block raw data
     uint8 blockRawData[256] = {0};
