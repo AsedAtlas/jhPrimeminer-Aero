@@ -1346,7 +1346,7 @@ int main(int argc, char **argv)
 	commandlineInput.L1CacheElements = 256000;
 	commandlineInput.targetOverride = 10;
 	commandlineInput.initialPrimorial = 67;
-	commandlineInput.sieveExtensions = 9;
+	commandlineInput.sieveExtensions = 10;
 	primeStats.adminFunc = false;
 	primeStats.tSplit = true;
 
