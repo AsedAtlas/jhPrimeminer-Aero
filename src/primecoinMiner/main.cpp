@@ -1339,7 +1339,8 @@ int jhMiner_main_xptMode()
 int main(int argc, char **argv)
 {
 	// setup some default values
-   commandlineInput.port = 10034;
+	commandlineInput.host = "ypool.net";
+	commandlineInput.port = 10034;
 
 	commandlineInput.workername = "x";
 	commandlineInput.workerpass = "x";
