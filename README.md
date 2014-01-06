@@ -37,6 +37,22 @@ cd jhPrimeminer
 
 make
 
+
+
+FreeBSD 10:
+
+(install dependencies from ports)
+security/openssl
+math/gmp
+
+git clone https://github.com/clintar/jhPrimeminer-Aero.git
+
+cd jhPrimeminer-Aero
+
+gmake
+
+
+
 *** Or follow this: https://bitcointalk.org/index.php?topic=359312.msg3844664
 
 If you found this helpful PLEASE support my work.

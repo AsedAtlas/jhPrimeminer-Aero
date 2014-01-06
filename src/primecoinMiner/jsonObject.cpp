@@ -27,7 +27,7 @@ jsonObject_t* jsonObject_getParameter(jsonObject_t* jsonObject, char* name)
 uint32 jsonObject_getArraySize(jsonObject_t* jsonObject)
 {
 	if( jsonObject->type != JSON_TYPE_ARRAY )
-		return NULL;
+		return 0;
 	return ((jsonObjectArray_t*)jsonObject)->list_values->objectCount;
 }
 

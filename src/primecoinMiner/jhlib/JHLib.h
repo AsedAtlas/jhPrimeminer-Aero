@@ -1,19 +1,18 @@
 
-
 #ifndef __JHSYSTEMLIB
 #define __JHSYSTEMLIB
 
 #ifdef _WIN32
 #define NOMINMAX
-#include<Windows.h>
+#include <Windows.h>
 #else
 #include <signal.h>
 #include <stdint.h>
 #endif
 #include <cstring> // for memcpy/memset
-#include<math.h>
+#include <math.h>
 #include <algorithm>
-
+#include <pthread.h>
 
 #ifndef _WIN32 // temporary replacement for _ADDRESSOF, replace with boost
 template< class T >

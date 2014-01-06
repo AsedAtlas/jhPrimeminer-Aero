@@ -8,6 +8,11 @@ ifeq ($(OSVERSION),Linux)
 	LIBS += -lrt
 endif
 
+ifeq ($(OSVERSION),FreeBSD)
+	CXX = clang++
+	CFLAGS += -DHAVE_DECL_LE32DEC
+endif
+
 # You might need to edit these paths too
 LIBPATHS = -L/usr/local/lib -L/usr/lib
 INCLUDEPATHS = -I/usr/local/include -I/usr/include -Isrc/primecoinMiner/includes/
