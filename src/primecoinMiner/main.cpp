@@ -617,7 +617,7 @@ void jhMiner_printHelp2() {
 
 void PrintPrimorialStats() {
 	double statsPassedTime = (double)(getTimeMilliseconds() - primeStats.primeLastUpdate);
-	printf("===============================================================\n");
+	printf("══════════════════════════════════════════════════════════════════════════════\n");
 	printf("        [    7ch] [    8ch] [    9ch] [   10ch] [   11ch] [  12ch+]\n");
 	for (int i=0;i<112;i++) {
 		if (primeStats.chainCounter2[i][0]>0) {
@@ -632,7 +632,7 @@ void PrintPrimorialStats() {
 			);
 		}
 	}
-	printf("\n");
+	printf("══════════════════════════════════════════════════════════════════════════════\n");
 }
 
 void jhMiner_parseCommandline(int argc, char **argv)
@@ -1293,7 +1293,7 @@ int jhMiner_main_xptMode()
                if( statsPassedTime < 1.0 ) statsPassedTime = 1.0; // avoid division by zero
 					double poolDiff = GetPrimeDifficulty( workData.xptClient->blockWorkInfo.nBitsShare);
 					double blockDiff = GetPrimeDifficulty( workData.xptClient->blockWorkInfo.nBits);
-						std::cout << std::endl << "--------------------------------------------------------------------------------" << std::endl;
+						std::cout << std::endl << "══════════════════════════════════════════════════════════════════════════════" << std::endl;
 						std::cout << "New Block: " << workData.xptClient->blockWorkInfo.height << " - Diff: " << blockDiff << " / " << poolDiff << std::endl;
 						std::cout << "Valid/Total shares: [ " << valid_shares << " / " << total_shares << " ]  -  Max diff: " << primeStats.bestPrimeChainDifficultySinceLaunch << std::endl;
 						 printf("        [    7ch] [    8ch] [    9ch] [   10ch] [   11ch] [  12ch+]\n");
@@ -1317,10 +1317,10 @@ int jhMiner_main_xptMode()
 				   ((double)primeStats.chainCounter[0][11] / statsPassedTime) * 3600000.0,
 				   ((double)primeStats.chainCounter[0][12] / statsPassedTime) * 3600000.0
 			   );
-			   printf("===============================================================\n");
+			   printf("══════════════════════════════════════════════════════════════════════════════\n");
 			   double shareValuePerHour = primeStats.fShareValue / totalRunTime * 3600000.0;
 			   printf("  Val/h: %8f                     Last Block/Total: %0.6f / %0.6f \n", shareValuePerHour, primeStats.fBlockShareValue, primeStats.fTotalSubmittedShareValue);               
-               printf("===============================================================\n");
+               printf("══════════════════════════════════════════════════════════════════════════════\n");
 
 					primeStats.fBlockShareValue = 0;
 				}
@@ -1372,18 +1372,18 @@ int main(int argc, char **argv)
 	primeStats.nL1CacheElements = commandlineInput.L1CacheElements;
 
    printf("\n");
-	printf("|===============================================================|\n");
-	printf("|  jhPrimeMiner - mod by AeroCloud - T16 beta                   |\n");
-	printf("|     optimised from rdebourbon 3.3 build + HP11 updates        |\n");
-	printf("|  author: JH (http://ypool.net)                                |\n");
-	printf("|  contributors: x3maniac, rdebourbon                           |\n");
-	printf("|  Credits: Sunny King for the original Primecoin client&miner  |\n");
-	printf("|  Credits: mikaelh for the performance optimizations           |\n");
-	printf("|                                                               |\n");
-	printf("|  Donations:                                                   |\n");
-	printf("|        XPM: AFv6FpGBqzGUW8puYzitUwZKjSHKczmteY                |\n");
-	printf("|        BTC: 1Ca9qP6tkAEo6EpgtXvuANr936c9FbgBrH                |\n");
-	printf("|===============================================================|\n");
+	printf("╔═══════════════════════════════════════════════════════════════╗\n");
+	printf("║  jhPrimeMiner - mod by AeroCloud - T16 beta                   ║\n");
+	printf("║     optimised from rdebourbon 3.3 build + HP11 updates        ║\n");
+	printf("║  author: JH (http://ypool.net)                                ║\n");
+	printf("║  contributors: x3maniac, rdebourbon                           ║\n");
+	printf("║  Credits: Sunny King for the original Primecoin client&miner  ║\n");
+	printf("║  Credits: mikaelh for the performance optimizations           ║\n");
+	printf("║                                                               ║\n");
+	printf("║  Donations:                                                   ║\n");
+	printf("║        XPM: AFv6FpGBqzGUW8puYzitUwZKjSHKczmteY                ║\n");
+	printf("║        BTC: 1Ca9qP6tkAEo6EpgtXvuANr936c9FbgBrH                ║\n");
+	printf("╚═══════════════════════════════════════════════════════════════╝\n");
     printf("Launching miner...\n");
 	// set priority lower so the user still can do other things
 #ifdef _WIN32
