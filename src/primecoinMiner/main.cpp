@@ -618,12 +618,11 @@ void jhMiner_printHelp2() {
 void PrintPrimorialStats() {
 	double statsPassedTime = (double)(getTimeMilliseconds() - primeStats.primeLastUpdate);
 	printf("===============================================================\n");
-	printf("        [    6ch] [    7ch] [    8ch] [    9ch] [   10ch] [   11ch] [  12ch+]\n");
+	printf("        [    7ch] [    8ch] [    9ch] [   10ch] [   11ch] [  12ch+]\n");
 	for (int i=0;i<112;i++) {
 		if (primeStats.chainCounter2[i][0]>0) {
-			printf("%6d: [%7d] [%7d] [%7d] [%7d] [%7d] [%7d] [%7d]\n",
+			printf("%6d: [%7d] [%7d] [%7d] [%7d] [%7d] [%7d]\n",
 				i,
-				primeStats.chainCounter2[i][6],
 				primeStats.chainCounter2[i][7],
 				primeStats.chainCounter2[i][8],
 				primeStats.chainCounter2[i][9],
@@ -855,7 +854,7 @@ void jhMiner_parseCommandline(int argc, char **argv)
 typedef std::pair <DWORD, HANDLE> thMapKeyVal;
 DWORD * threadHearthBeat;
 
-static void watchdog_thread(std::map<DWORD, HANDLE> threadMap)
+static void watchdog_thread(std::map<DWORD, HANDLE> &threadMap)
 #else
 static void *watchdog_thread(void *)
 
@@ -1297,13 +1296,12 @@ int jhMiner_main_xptMode()
 						std::cout << std::endl << "--------------------------------------------------------------------------------" << std::endl;
 						std::cout << "New Block: " << workData.xptClient->blockWorkInfo.height << " - Diff: " << blockDiff << " / " << poolDiff << std::endl;
 						std::cout << "Valid/Total shares: [ " << valid_shares << " / " << total_shares << " ]  -  Max diff: " << primeStats.bestPrimeChainDifficultySinceLaunch << std::endl;
-						 printf("        [    6ch] [    7ch] [    8ch] [    9ch] [   10ch] [   11ch] [  12ch+]\n");
+						 printf("        [    7ch] [    8ch] [    9ch] [   10ch] [   11ch] [  12ch+]\n");
 
                statsPassedTime = (double)(getTimeMilliseconds() - primeStats.blockStartTime);
 
                if( statsPassedTime < 1.0 ) statsPassedTime = 1.0; // avoid division by zero
-			   printf(" Total: [%7d] [%7d] [%7d] [%7d] [%7d] [%7d] [%7d]\n",
-				   primeStats.chainCounter[0][6],
+			   printf(" Total: [%7d] [%7d] [%7d] [%7d] [%7d] [%7d]\n",
 				   primeStats.chainCounter[0][7],
 				   primeStats.chainCounter[0][8],
 				   primeStats.chainCounter[0][9],
@@ -1311,8 +1309,7 @@ int jhMiner_main_xptMode()
 				   primeStats.chainCounter[0][11],
 				   primeStats.chainCounter[0][12]
 			   );
-			   printf("  ch/h: [%7.02f] [%7.03f] [%7.03f] [%7.03f] [%7.03f] [%7.03f] [%7.03f]\n",
-				   ((double)primeStats.chainCounter[0][6] / statsPassedTime) * 3600000.0,
+			   printf("  ch/h: [%7.03f] [%7.03f] [%7.03f] [%7.03f] [%7.03f] [%7.03f]\n",
 				   ((double)primeStats.chainCounter[0][7] / statsPassedTime) * 3600000.0,
 				   ((double)primeStats.chainCounter[0][8] / statsPassedTime) * 3600000.0,
 				   ((double)primeStats.chainCounter[0][9] / statsPassedTime) * 3600000.0,

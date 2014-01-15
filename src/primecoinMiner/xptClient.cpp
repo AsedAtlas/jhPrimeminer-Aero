@@ -65,13 +65,14 @@ xptClient_t* xptClient_connect(jsonRequestTarget_t* target, uint32 payloadNum)
 	xptClient_t* xptClient = (xptClient_t*)malloc(sizeof(xptClient_t));
 	memset(xptClient, 0x00, sizeof(xptClient_t));
 	xptClient->clientSocket = clientSocket;
-	xptClient->sendBuffer = xptPacketbuffer_create(64*1024);
-	xptClient->recvBuffer = xptPacketbuffer_create(64*1024);
+	xptClient->sendBuffer = xptPacketbuffer_create(256*1024);
+	xptClient->recvBuffer = xptPacketbuffer_create(256*1024);
 	fStrCpy(xptClient->username, target->authUser, 127);
 	fStrCpy(xptClient->password, target->authPass, 127);
 	xptClient->payloadNum = std::max<uint32>(1, std::min<uint32>(127, payloadNum));
 #ifdef _WIN32
 	InitializeCriticalSection(&xptClient->cs_shareSubmit);
+	InitializeCriticalSection(&xptClient->cs_workAccess);
 #else
   pthread_mutex_init(&xptClient->cs_shareSubmit, NULL);
 #endif
@@ -118,7 +119,7 @@ void xptClient_sendClientServerPing(xptClient_t* xptClient, uint64 timestamp)
 	// build the packet
 	bool sendError = false;
 	xptPacketbuffer_beginWritePacket(xptClient->sendBuffer, XPT_OPC_C_PING);
-	xptPacketbuffer_writeU32(xptClient->sendBuffer, &sendError, 2);								// version
+	xptPacketbuffer_writeU32(xptClient->sendBuffer, &sendError, 5);								// version
 	xptPacketbuffer_writeU32(xptClient->sendBuffer, &sendError, tsLow);							// lower 32 bits of timestamp
 	xptPacketbuffer_writeU32(xptClient->sendBuffer, &sendError, tsHigh);						// upper 32 bits of timestamp
 	// finalize
@@ -142,15 +143,17 @@ void xptClient_processClientServerPing(xptClient_t* xptClient)
  */
 void xptClient_sendWorkerLogin(xptClient_t* xptClient)
 {
-	uint32 usernameLength = std::min(127, fStrLen(xptClient->username));
-	uint32 passwordLength = std::min(127, fStrLen(xptClient->password));
+	
+//	uint32 usernameLength = std::min(127, fStrLen(xptClient->username)); //unused
+//	uint32 passwordLength = std::min(127, fStrLen(xptClient->password)); //unused
 	// build the packet
 	bool sendError = false;
 	xptPacketbuffer_beginWritePacket(xptClient->sendBuffer, XPT_OPC_C_AUTH_REQ);
-	xptPacketbuffer_writeU32(xptClient->sendBuffer, &sendError, 2);								// version
+	xptPacketbuffer_writeU32(xptClient->sendBuffer, &sendError, 5);								// version
 	xptPacketbuffer_writeString(xptClient->sendBuffer, xptClient->username, 128, &sendError);	// username
 	xptPacketbuffer_writeString(xptClient->sendBuffer, xptClient->password, 128, &sendError);	// password
 	xptPacketbuffer_writeU32(xptClient->sendBuffer, &sendError, xptClient->payloadNum);			// payloadNum
+	// write worker version to server
 	xptPacketbuffer_writeString(xptClient->sendBuffer, minerVersionString, 45, &sendError);	// minerVersionString
 	// finalize
 	xptPacketbuffer_finalizeWritePacket(xptClient->sendBuffer);
@@ -182,6 +185,8 @@ void xptClient_sendShare(xptClient_t* xptClient, xptShareToSubmit_t* xptShareToS
 	// bnChainMultiplier
 	xptPacketbuffer_writeU8(xptClient->sendBuffer, &sendError, xptShareToSubmit->chainMultiplierSize);
 	xptPacketbuffer_writeData(xptClient->sendBuffer, xptShareToSubmit->chainMultiplier, xptShareToSubmit->chainMultiplierSize, &sendError);
+	// share id (server sends this back in shareAck, so we can identify share response)
+        xptPacketbuffer_writeU32(xptClient->sendBuffer, &sendError, 0);
 	// finalize
 	xptPacketbuffer_finalizeWritePacket(xptClient->sendBuffer);
 	// send to client
@@ -203,6 +208,8 @@ bool xptClient_processPacket(xptClient_t* xptClient)
 		return xptClient_processPacket_shareAck(xptClient);
 	else if( xptClient->opcode == XPT_OPC_S_PING )
 		return xptClient_processPacket_client2ServerPing(xptClient);
+	else if( xptClient->opcode == XPT_OPC_S_MESSAGE )
+		return xptClient_processPacket_message(xptClient);
 
 
 	// unknown opcodes are accepted too, for later backward compatibility

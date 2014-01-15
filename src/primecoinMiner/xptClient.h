@@ -69,5 +69,5 @@ bool xptClient_processPacket_authResponse(xptClient_t* xptClient);
 bool xptClient_processPacket_blockData1(xptClient_t* xptClient);
 bool xptClient_processPacket_shareAck(xptClient_t* xptClient);
 bool xptClient_processPacket_client2ServerPing(xptClient_t* xptClient);
-
+bool xptClient_processPacket_message(xptClient_t* xptClient);
 extern char* minerVersionString;

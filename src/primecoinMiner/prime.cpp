@@ -822,7 +822,7 @@ static unsigned int int_invert(unsigned int a, unsigned int nPrime) {
 void CSieveOfEratosthenes::ProcessMultiplier(sieve_word_t *vfComposites, const unsigned int nMinMultiplier, const unsigned int nMaxMultiplier, const std::vector<unsigned int>& vPrimes, unsigned int *vMultipliers, unsigned int nLayerSeq) {
    // Wipe the part of the array first
    if (nMinMultiplier < nMaxMultiplier)
-      memset(vfComposites + GetWordNum(nMinMultiplier), 0, ((nMaxMultiplier - nMinMultiplier) / nWordBits) * sizeof(uint64));
+      memset(vfComposites + GetWordNum(nMinMultiplier), 0, ((nMaxMultiplier - nMinMultiplier) / nWordBits) * sizeof(uint64)); // set to uint for 32bit maybe. at least helped it compile
    
    for (unsigned int nPrimeSeqLocal = nMinPrimeSeq; nPrimeSeqLocal < nPrimes; nPrimeSeqLocal++) {
       const unsigned int nPrime = vPrimes[nPrimeSeqLocal];
