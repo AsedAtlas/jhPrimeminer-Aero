@@ -16,5 +16,6 @@ typedef unsigned __int64 uint64_t;
 #endif
 
 uint64_t getTimeMilliseconds(void);
-
+uint64_t getTimeHighRes(void);
+uint64_t getTimerRes(void);
 #endif // TICKER_H

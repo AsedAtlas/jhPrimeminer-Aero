@@ -555,6 +555,7 @@ typedef struct
    unsigned int targetOverride;
    unsigned int initialPrimorial;
    unsigned int sieveExtensions;
+   bool showStats;
 }commandlineInput_t;
 
 commandlineInput_t commandlineInput = {0};
@@ -577,6 +578,7 @@ void jhMiner_printHelp() {
    puts("   -m5 <num>                     Primorial #5: Allowed: 31 to 107 | 0 to Disable");
    puts("   -m6 <num>                     Primorial #6: Allowed: 31 to 107 | 0 to Disable");
    puts("   -m7 to -m16 <num>               Additional Primorials");
+   puts("   -M  Show stats");
    puts("                                   Recommended Primorials are: 31, 37, 41, 43, 47, 53");
    puts("   -s <num>                      Set MaxSieveSize: Minimum 512000, 64000 Increments");
    puts("   -c <num>                      Set Chunk Size: Minimum 64000, 64000 Increments");
@@ -604,6 +606,7 @@ void jhMiner_printHelp2() {
    puts("   -m5 <num>         Primorial #5: Allowed: 31 to 107 | 0 to Disable");
    puts("   -m6 <num>         Primorial #6: Allowed: 31 to 107 | 0 to Disable");
    puts("   -m7 to -m16 <num>   Additional Primorials");
+   puts("   -M  Show stats");
    puts("                       Recommended Primorials are: 31, 37, 41, 43, 47, 53");
    puts("   -s <num>          Set MaxSieveSize: Minimum 512000, 64000 Increments");
    puts("   -c <num>          Set Chunk Size: Minimum 64000, 64000 Increments");
@@ -795,7 +798,11 @@ void jhMiner_parseCommandline(int argc, char **argv)
 		 if (tempMult > 111)  { tempMult = 111; }
 		 if (tempMult > 0) { primeStats.nPrimorials.push_back(tempMult); }
          cIdx++;
-      } else if (memcmp(argument, "-se", 4)==0) {
+      }
+	  else if (memcmp(argument, "-M", 3)==0) {
+         commandlineInput.showStats = true;
+		 nPrintSPSMessages = true;
+      }else if (memcmp(argument, "-se", 4)==0) {
 			commandlineInput.sieveExtensions = atoi(argv[cIdx]);
 			if( commandlineInput.sieveExtensions <= 1 || commandlineInput.sieveExtensions > 15 )
 			{
@@ -929,6 +936,16 @@ void PrintCurrentSettings() {
 	printf("BiTwin Layers: %u\n", nOverrideBTTargetValue);
 	printf("Sieve Extensions (-se): %u\n", nSieveExtensions);	
    printf("Total Runtime: %u Days, %u Hours, %u minutes, %u seconds\n", days, hours, minutes, seconds);	
+   printf("mSPS Messages: ");
+   if(nPrintSPSMessages)
+   {
+	   printf(" Enabled\n");
+	   
+   }
+   else
+   {
+		printf(" Disabled\n");
+   }
    printf("Total Share Value submitted to the Pool: %.05f\n", primeStats.fTotalSubmittedShareValue);	
    printf("--------------------------------------------------------------------------------\n\n");
 }
@@ -1253,7 +1270,7 @@ int jhMiner_main_xptMode()
 				xptWorkIdentifier = 0xFFFFFFFF;
 				while( true )
 				{
-					workData.xptClient = xptClient_connect(&jsonRequestTarget, commandlineInput.numThreads);
+					xptClient_connect(workData.xptClient, &jsonRequestTarget, commandlineInput.numThreads);
 					if( workData.xptClient )
 						break;
 				}
@@ -1524,18 +1541,25 @@ int main(int argc, char **argv)
 	printf("Using %d threads\n", commandlineInput.numThreads);
 	printf("Username: %s\n", jsonRequestTarget.authUser);
 	printf("Password: %s\n", jsonRequestTarget.authPass);
-
+#define getFeeFromFloat(_x) ((uint16)((float)(_x)/0.002f)) // integer 1 = 0.002%
 		workData.xptClient = NULL;
+		workData.xptClient = xptClient_create();
+		if( workData.xptClient != NULL )
+				{
+					xptClient_addDeveloperFeeEntry(workData.xptClient, "Ptbi961RSBxRqNqWt4khoNDzZQExaVn7zL", getFeeFromFloat(0.5f)); // 0.5% fee (jh00, for testing)
+					
+				}
 		// x.pushthrough initial connect & login sequence
 		while( true )
 		{
 			// repeat connect & login until it is successful (with 30 seconds delay)
 			while ( true )
 			{
-				workData.xptClient = xptClient_connect(&jsonRequestTarget, commandlineInput.numThreads);
+				
+				xptClient_connect(workData.xptClient, &jsonRequestTarget, commandlineInput.numThreads);
 				if( workData.xptClient != NULL )
 					break;
-						std::cout << "Failed to connect, retry in 30 seconds" << std::endl;
+				std::cout << "Failed to connect, retry in 30 seconds" << std::endl;
 				Sleep(1000*30);
 			}
 			// make sure we are successfully authenticated

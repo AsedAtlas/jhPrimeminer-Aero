@@ -51,7 +51,8 @@ OBJS = \
 	src/primecoinMiner/xptClientPacketHandler.o \
 	src/primecoinMiner/xptPacketbuffer.o \
 	src/primecoinMiner/xptServer.o \
-	src/primecoinMiner/xptServerPacketHandler.o
+	src/primecoinMiner/xptServerPacketHandler.o \
+	src/primecoinMiner/sha2.o
 
 all: jhprimeminer
   

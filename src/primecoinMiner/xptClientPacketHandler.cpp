@@ -1,6 +1,5 @@
 #include"global.h"
 #include"ticker.h"
-
 #include <iostream>
 /*
  * Called when a packet with the opcode XPT_OPC_S_AUTH_ACK is received
@@ -28,6 +27,8 @@ bool xptClient_processPacket_authResponse(xptClient_t* xptClient)
 			std::cout << "xpt: Logged in" << std::endl;
 			if( rejectReason[0] != '\0' )
 				std::cout << "Message from server: " << rejectReason << std::endl;
+		// start ping mechanism
+		xptClient->time_sendPing = (uint32)time(NULL) + 60; // first ping after one minute
 	}
 	else
 	{
@@ -57,6 +58,15 @@ bool xptClient_processPacket_blockData1(xptClient_t* xptClient)
 	xptClient->blockWorkInfo.nBitsShare = xptPacketbuffer_readU32(xptClient->recvBuffer, &recvError);		// nBitsRecommended / nBitsShare
 	xptClient->blockWorkInfo.nTime = xptPacketbuffer_readU32(xptClient->recvBuffer, &recvError);			// nTimestamp
 	xptPacketbuffer_readData(xptClient->recvBuffer, xptClient->blockWorkInfo.prevBlock, 32, &recvError);	// prevBlockHash
+
+	// New in xpt version 6 - Targets are send in compact format (4 bytes instead of 32)
+//    uint32 targetCompact = xptPacketbuffer_readU32(xptClient->recvBuffer, &recvError);
+//    uint32 targetShareCompact = xptPacketbuffer_readU32(xptClient->recvBuffer, &recvError);
+//    xptClient_getDifficultyTargetFromCompact(targetCompact, (uint32*)xptClient->blockWorkInfo.target);
+//    xptClient_getDifficultyTargetFromCompact(targetShareCompact, (uint32*)xptClient->blockWorkInfo.targetShare);
+	
+	
+	
 	uint32 payloadNum = xptPacketbuffer_readU32(xptClient->recvBuffer, &recvError);							// payload num
 	if( recvError )
 	{
@@ -175,4 +185,36 @@ bool xptClient_processPacket_message(xptClient_t* xptClient)
                 return false;
         printf("Server message: %s\n", messageText);
         return true;
+}
+
+/*
+ + * Called when a packet with the opcode XPT_OPC_S_PING is received
+ + */
+bool xptClient_processPacket_ping(xptClient_t* xptClient)
+{
+  xptPacketbuffer_t* cpb = xptClient->recvBuffer;
+  // read data from the packet
+  xptPacketbuffer_beginReadPacket(cpb);
+  // start parsing
+  bool readError = false;
+  // read timestamp
+  uint64 timestamp = xptPacketbuffer_readU64(cpb, &readError);
+  if( readError )
+    return false;
+  // get current high precision time and frequency
+  uint64 timestampNow = getTimeHighRes();
+  // calculate time difference in ms
+  uint64 timeDif = timestampNow - timestamp;
+  timeDif *= 10000ULL;
+
+  timeDif /= getTimerRes();
+
+
+  // update and calculate simple average
+  xptClient->pingSum += timeDif;
+  xptClient->pingCount++;
+  double averagePing = (double)xptClient->pingSum / (double)xptClient->pingCount / 10.0;
+  printf("Ping %d.%dms (Average %.1lf)\n", (sint32)(timeDif/10), (sint32)(timeDif%10), averagePing);
+
+  return true;
 }
