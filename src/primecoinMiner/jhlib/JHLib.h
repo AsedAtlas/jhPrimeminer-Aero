@@ -8,11 +8,11 @@
 #else
 #include <signal.h>
 #include <stdint.h>
+#include <pthread.h>
 #endif
 #include <cstring> // for memcpy/memset
 #include <math.h>
 #include <algorithm>
-#include <pthread.h>
 
 #ifndef _WIN32 // temporary replacement for _ADDRESSOF, replace with boost
 template< class T >

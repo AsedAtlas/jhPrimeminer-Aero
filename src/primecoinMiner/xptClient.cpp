@@ -72,7 +72,6 @@ xptClient_t* xptClient_connect(jsonRequestTarget_t* target, uint32 payloadNum)
 	xptClient->payloadNum = std::max<uint32>(1, std::min<uint32>(127, payloadNum));
 #ifdef _WIN32
 	InitializeCriticalSection(&xptClient->cs_shareSubmit);
-	InitializeCriticalSection(&xptClient->cs_workAccess);
 #else
   pthread_mutex_init(&xptClient->cs_shareSubmit, NULL);
 #endif

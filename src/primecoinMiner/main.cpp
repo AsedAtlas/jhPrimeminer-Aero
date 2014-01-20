@@ -818,12 +818,12 @@ void jhMiner_parseCommandline(int argc, char **argv)
 	  } else if (memcmp(argument, "-s", 3)==0) {
          commandlineInput.sieveSize = atoi(argv[cIdx]);
          if (commandlineInput.sieveSize < 512000) { commandlineInput.sieveSize=512000; }
-		 commandlineInput.sieveSize = ceil(commandlineInput.sieveSize/64000)*64000;
+		 commandlineInput.sieveSize = ceil((double) commandlineInput.sieveSize/64000)*64000;
 			cIdx++;
       } else if (memcmp(argument, "-c", 3)==0) {
          commandlineInput.L1CacheElements = atoi(argv[cIdx]);
 		 if (commandlineInput.L1CacheElements < 64000) { commandlineInput.L1CacheElements=64000; }
-		 commandlineInput.L1CacheElements = ceil(commandlineInput.L1CacheElements/64000)*64000;
+		 commandlineInput.L1CacheElements = ceil((double) commandlineInput.L1CacheElements/64000)*64000;
          cIdx++;
       }
 
