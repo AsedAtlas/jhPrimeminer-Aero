@@ -1,5 +1,6 @@
 #include"global.h"
 #include"ticker.h"
+#include <inttypes.h>
 #include <iostream>
 /*
  * Called when a packet with the opcode XPT_OPC_S_AUTH_ACK is received
@@ -136,32 +137,6 @@ bool xptClient_processPacket_shareAck(xptClient_t* xptClient)
 	return true;
 }
 
-/*
- * Called when a packet with the opcode XPT_OPC_S_PING is received
- */
-bool xptClient_processPacket_client2ServerPing(xptClient_t* xptClient)
-{
-	// parse block data
-	bool recvError = false;
-	xptPacketbuffer_beginReadPacket(xptClient->recvBuffer);
-	xptClient->workDataValid = false;
-	// add general block info
-	uint32 version = xptPacketbuffer_readU32(xptClient->recvBuffer, &recvError);			// version
-	uint32 tsLow = xptPacketbuffer_readU32(xptClient->recvBuffer, &recvError);				// lower 32 bits of timestamp
-	uint32 tsHigh = xptPacketbuffer_readU32(xptClient->recvBuffer, &recvError);				// upper 32 bits of timestamp
-	if( recvError )
-	{
-			std::cout << "xptClient_processPacket_client2ServerPing(): Parse error" << std::endl;
-		return false;
-	}
-
-	uint64 pingSentTimestamp = ((uint64) tsLow) | (((uint64) tsHigh) << 32);
-	uint64 now = getTimeMilliseconds();
-	uint64 roundtrip = now - pingSentTimestamp;
-
-//	std::cout << "Reply from server time=" << roundtrip << "ms" << std::endl;
-	return true;
-}
 
 /*
  * Called when a packet with the opcode XPT_OPC_S_MESSAGE is received
@@ -188,8 +163,8 @@ bool xptClient_processPacket_message(xptClient_t* xptClient)
 }
 
 /*
- + * Called when a packet with the opcode XPT_OPC_S_PING is received
- + */
+ * Called when a packet with the opcode XPT_OPC_S_PING is received
+ */
 bool xptClient_processPacket_ping(xptClient_t* xptClient)
 {
   xptPacketbuffer_t* cpb = xptClient->recvBuffer;
@@ -204,17 +179,17 @@ bool xptClient_processPacket_ping(xptClient_t* xptClient)
   // get current high precision time and frequency
   uint64 timestampNow = getTimeHighRes();
   // calculate time difference in ms
-  uint64 timeDif = timestampNow - timestamp;
+	uint64 timeDif = timestampNow - timestamp;
+#ifdef _WIN32
   timeDif *= 10000ULL;
-
   timeDif /= getTimerRes();
-
-
+#else
+	timeDif /= 100000;
+#endif
   // update and calculate simple average
   xptClient->pingSum += timeDif;
   xptClient->pingCount++;
   double averagePing = (double)xptClient->pingSum / (double)xptClient->pingCount / 10.0;
   printf("Ping %d.%dms (Average %.1lf)\n", (sint32)(timeDif/10), (sint32)(timeDif%10), averagePing);
-
   return true;
 }

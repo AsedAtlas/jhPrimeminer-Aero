@@ -3,6 +3,7 @@
 #ifndef _WIN32
 #include <errno.h>
 #endif
+#include <inttypes.h>
 #include <iostream>
 #define SHA2_TYPES
 #include "sha2.h"
@@ -392,38 +393,7 @@ const char base58Decode[] =
      }
  }
  
-#define XPT_CLIENT_SERVER_PING_INTERVAL 10000UL
 
-void xptClient_client2ServerSent(xptClient_t* xptClient)
-{
-	xptClient->lastClient2ServerInteractionTimestamp = getTimeMilliseconds();
-}
-
-void xptClient_sendClientServerPing(xptClient_t* xptClient, uint64 timestamp)
-{
-	uint32 tsLow = (uint32) timestamp;
-	uint32 tsHigh = (uint32) (timestamp >> 32);
-	// build the packet
-	bool sendError = false;
-	xptPacketbuffer_beginWritePacket(xptClient->sendBuffer, XPT_OPC_C_PING);
-	xptPacketbuffer_writeU32(xptClient->sendBuffer, &sendError, 5);								// version
-	xptPacketbuffer_writeU32(xptClient->sendBuffer, &sendError, tsLow);							// lower 32 bits of timestamp
-	xptPacketbuffer_writeU32(xptClient->sendBuffer, &sendError, tsHigh);						// upper 32 bits of timestamp
-	// finalize
-	xptPacketbuffer_finalizeWritePacket(xptClient->sendBuffer);
-	// send to client
-	send(xptClient->clientSocket, (const char*)(xptClient->sendBuffer->buffer), xptClient->sendBuffer->parserIndex, 0);
-	xptClient_client2ServerSent(xptClient);
-}
-
-void xptClient_processClientServerPing(xptClient_t* xptClient)
-{
-	uint64 now = getTimeMilliseconds();
-	if ((xptClient->lastClient2ServerInteractionTimestamp + XPT_CLIENT_SERVER_PING_INTERVAL) < now)
-	{
-		xptClient_sendClientServerPing(xptClient, now);
-	}
-}
 
 /*
  * Sends the worker login packet
@@ -454,7 +424,6 @@ void xptClient_sendWorkerLogin(xptClient_t* xptClient)
 	xptPacketbuffer_finalizeWritePacket(xptClient->sendBuffer);
 	// send to client
 	send(xptClient->clientSocket, (const char*)(xptClient->sendBuffer->buffer), xptClient->sendBuffer->parserIndex, 0);
-	xptClient_client2ServerSent(xptClient);
 }
 
 /*
@@ -486,7 +455,7 @@ void xptClient_sendShare(xptClient_t* xptClient, xptShareToSubmit_t* xptShareToS
 	xptPacketbuffer_finalizeWritePacket(xptClient->sendBuffer);
 	// send to client
 	send(xptClient->clientSocket, (const char*)(xptClient->sendBuffer->buffer), xptClient->sendBuffer->parserIndex, 0);
-	xptClient_client2ServerSent(xptClient);
+
 }
 
 
@@ -496,14 +465,8 @@ void xptClient_sendShare(xptClient_t* xptClient, xptShareToSubmit_t* xptShareToS
   */
  void xptClient_sendPing(xptClient_t* xptClient)
  {
-   // Windows only for now
-#ifdef WIN32  
-   LARGE_INTEGER hpc;
-   QueryPerformanceCounter(&hpc);
-   uint64 timestamp = (uint64)hpc.QuadPart;
-#else
-uint64 timestamp = getTimeMilliseconds();
-#endif
+
+   uint64 timestamp = getTimeHighRes();
    // build the packet
    bool sendError = false;
    xptPacketbuffer_beginWritePacket(xptClient->sendBuffer, XPT_OPC_C_PING);
@@ -527,8 +490,6 @@ bool xptClient_processPacket(xptClient_t* xptClient)
 		return xptClient_processPacket_blockData1(xptClient);
 	else if( xptClient->opcode == XPT_OPC_S_SHARE_ACK )
 		return xptClient_processPacket_shareAck(xptClient);
-	else if( xptClient->opcode == XPT_OPC_S_PING )
-		return xptClient_processPacket_client2ServerPing(xptClient);
 	else if( xptClient->opcode == XPT_OPC_S_MESSAGE )
 		return xptClient_processPacket_message(xptClient);
 	else if( xptClient->opcode == XPT_OPC_S_PING )
@@ -569,11 +530,11 @@ bool xptClient_process(xptClient_t* xptClient)
   pthread_mutex_unlock(&xptClient->cs_shareSubmit);
 #endif
    // check if we need to send ping
-   uint32 currentTime = (uint32)getTimeMilliseconds();
+   uint32 currentTime = (uint32)time(NULL);
    if( xptClient->time_sendPing != 0 && currentTime >= xptClient->time_sendPing )
    {
      xptClient_sendPing(xptClient);
-     xptClient->time_sendPing = currentTime + 2; // ping every 4 minutes
+     xptClient->time_sendPing = currentTime + 240; // ping every 4 minutes
    }
 	// check for packets
 	uint32 packetFullSize = 4; // the packet always has at least the size of the header
@@ -594,15 +555,11 @@ bool xptClient_process(xptClient_t* xptClient)
 #else
     if(errno != EAGAIN)
     {
-    xptClient->disconnected = true;
-    return false;
+		xptClient->disconnected = true;
+		return false;
     }
 #endif
-
-		// Check if we shall send ping, because of no other activity happened
-		xptClient_processClientServerPing(xptClient);
-
-		return true;
+	return true;
 	}
 	xptClient->recvIndex += r;
 	// header just received?

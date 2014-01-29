@@ -554,6 +554,7 @@ typedef struct
 	unsigned int L1CacheElements;
    unsigned int targetOverride;
    unsigned int initialPrimorial;
+   unsigned int initialPrimorial2;
    unsigned int sieveExtensions;
    bool showStats;
 }commandlineInput_t;
@@ -561,51 +562,45 @@ typedef struct
 commandlineInput_t commandlineInput = {0};
 
 void jhMiner_printHelp() {
-   puts("Usage: jhPrimeminer.exe [options]");
+   puts("Usage: jhPrimeminer [options]");
    puts("Options:");
-   puts("   -o, -O                        The miner will connect to this url");
-   puts("                                 You can specifiy an port after the url using -o url:port");
-   puts("   -u                            The username (workername) used for login");
-   puts("   -p                            The password used for login");
-   puts("   -t <num>                      The number of threads for mining (default ALL Threads)");
-   puts("                                     For most efficient mining, set to number of CPU cores");
-   puts("   -layers <num>                 Set Sieve Layers: Allowed: 9 to 12");
-   puts("   -split <num>                  Split Primorials by Thread (default 0)");
-   puts("   -m <num>                      Primorial #1: Allowed: 31 to 107");
-   puts("   -m2 <num>                     Primorial #2: Allowed: 31 to 107 | 0 to Disable");
-   puts("   -m3 <num>                     Primorial #3: Allowed: 31 to 107 | 0 to Disable");
-   puts("   -m4 <num>                     Primorial #4: Allowed: 31 to 107 | 0 to Disable");
-   puts("   -m5 <num>                     Primorial #5: Allowed: 31 to 107 | 0 to Disable");
-   puts("   -m6 <num>                     Primorial #6: Allowed: 31 to 107 | 0 to Disable");
-   puts("   -m7 to -m16 <num>               Additional Primorials");
+   puts("   -o, -O           The miner will connect to this url");
+   puts("                    You can specifiy an port after the url using -o url:port");
+   puts("   -u               The username (workername) used for login");
+   puts("   -p               The password used for login");
+   puts("   -t <num>         The number of threads for mining (default ALL Threads)");
+   puts("                    For most efficient mining, set to number of CPU cores");
+   puts("   -layers <num>    Set Sieve Layers: Allowed: 9 to 12");
+   puts("   -split <num>     Split Primorials by Thread (default 0)");
+   puts("   -m <num>         Primorial #1: Allowed: 31 to 107");
+   puts("   -m <num>         Primorial #2: Allowed: 31 to 107 | 0 to Disable");
+   puts("   -m <num>         Primorial #3: Allowed: 31 to 107 | 0 to Disable");
+   puts("                      ... repeat -m <num> for desired number of primorials");
    puts("   -M  Show stats");
-   puts("                                   Recommended Primorials are: 31, 37, 41, 43, 47, 53");
-   puts("   -s <num>                      Set MaxSieveSize: Minimum 512000, 64000 Increments");
-   puts("   -c <num>                      Set Chunk Size: Minimum 64000, 64000 Increments");
+   puts("                       Recommended Primorials are: 31, 37, 41, 43, 47, 53");
+   puts("   -s <num>          Set MaxSieveSize: Minimum 512000, 64000 Increments");
+   puts("   -c <num>          Set Chunk Size: Minimum 64000, 64000 Increments");
    puts("Example usage:");
-   puts("   jhPrimeminer.exe -o http://ypool.net:10034 -u workername.1 -p workerpass -t 4");
+   puts("   jhPrimeminer -o http://ypool.net:10034 -u workername.1 -p workerpass -t 4");
    puts("Press any key to continue...");
    getchar();
 }
 
 void jhMiner_printHelp2() {
-   puts("Usage: jhPrimeminer.exe [options]");
+   puts("Usage: jhPrimeminer [options]");
    puts("Options:");
-   puts("   -o, -O            The miner will connect to this url");
-   puts("                       You can specifiy an port after the url using -o url:port");
-   puts("   -u                The username (workername) used for login");
-   puts("   -p                The password used for login");
-   puts("   -t <num>          The number of threads for mining (default ALL Threads)");
-   puts("                       For most efficient mining, set to number of CPU cores");
-   puts("   -layers <num>     Set Sieve Layers: Allowed: 9 to 12");
-   puts("   -split <num>      Split Primorials by Thread (default 0)");
-   puts("   -m <num>          Primorial #1: Allowed: 31 to 107");
-   puts("   -m2 <num>         Primorial #2: Allowed: 31 to 107 | 0 to Disable");
-   puts("   -m3 <num>         Primorial #3: Allowed: 31 to 107 | 0 to Disable");
-   puts("   -m4 <num>         Primorial #4: Allowed: 31 to 107 | 0 to Disable");
-   puts("   -m5 <num>         Primorial #5: Allowed: 31 to 107 | 0 to Disable");
-   puts("   -m6 <num>         Primorial #6: Allowed: 31 to 107 | 0 to Disable");
-   puts("   -m7 to -m16 <num>   Additional Primorials");
+   puts("   -o, -O           The miner will connect to this url");
+   puts("                    You can specifiy an port after the url using -o url:port");
+   puts("   -u               The username (workername) used for login");
+   puts("   -p               The password used for login");
+   puts("   -t <num>         The number of threads for mining (default ALL Threads)");
+   puts("                    For most efficient mining, set to number of CPU cores");
+   puts("   -layers <num>    Set Sieve Layers: Allowed: 9 to 12");
+   puts("   -split <num>     Split Primorials by Thread (default 0)");
+   puts("   -m <num>         Primorial #1: Allowed: 31 to 107");
+   puts("   -m <num>         Primorial #2: Allowed: 31 to 107 | 0 to Disable");
+   puts("   -m <num>         Primorial #3: Allowed: 31 to 107 | 0 to Disable");
+   puts("                      ... repeat -m <num> for desired number of primorials");
    puts("   -M  Show stats");
    puts("                       Recommended Primorials are: 31, 37, 41, 43, 47, 53");
    puts("   -s <num>          Set MaxSieveSize: Minimum 512000, 64000 Increments");
@@ -640,6 +635,8 @@ void PrintPrimorialStats() {
 
 void jhMiner_parseCommandline(int argc, char **argv)
 {
+	commandlineInput.initialPrimorial = 0;
+	commandlineInput.initialPrimorial2 = 0;
 	using namespace std;
 	sint32 cIdx = 1;
 	while( cIdx < argc )
@@ -704,9 +701,14 @@ void jhMiner_parseCommandline(int argc, char **argv)
 			}
          cIdx++;
       } else if (memcmp(argument, "-m", 3)==0) {
-         commandlineInput.initialPrimorial = atoi(argv[cIdx]);
-		 if (commandlineInput.initialPrimorial < 11)  { commandlineInput.initialPrimorial = 11; }
-		 if (commandlineInput.initialPrimorial > 111)  { commandlineInput.initialPrimorial = 111; }
+         unsigned int tempMult = atoi(argv[cIdx]);
+		 if (tempMult > 0 && tempMult < 11)  { tempMult = 11; }
+		 if (tempMult > 111)  { tempMult = 111; }
+		 if (tempMult > 0) 
+		 { 
+			 primeStats.nPrimorials.push_back(tempMult); 
+			 commandlineInput.initialPrimorial = tempMult;
+		 }
          cIdx++;
       } else if (memcmp(argument, "-m2", 4)==0) {
          unsigned int tempMult = atoi(argv[cIdx]);
@@ -842,11 +844,7 @@ void jhMiner_parseCommandline(int argc, char **argv)
 		else
 		{
 			cout << "'" << argument << "' is an unknown option." << endl;
-			#ifdef _WIN32
-				cout << "Type jhPrimeminer.exe -help for more info" << endl;
-			#else
-				cout << "Type jhPrimeminer -help for more info" << endl; 
-			#endif
+			cout << "Type jhPrimeminer -help for more info" << endl; 
 			exit(-1);
 		}
 	}
@@ -1497,11 +1495,26 @@ int main(int argc, char **argv)
 	primeStats.nWaveTime = 0;
 	primeStats.nWaveRound = 0;
 
-	primeStats.nPrimorials.push_back(commandlineInput.initialPrimorial);
+	//primeStats.nPrimorials.push_back(commandlineInput.initialPrimorial);
 
 	std::set<unsigned int> pSet(primeStats.nPrimorials.begin(),primeStats.nPrimorials.end());
 	primeStats.nPrimorials.clear();
 	primeStats.nPrimorials.assign(pSet.begin(),pSet.end());
+	if (commandlineInput.initialPrimorial > 0 || primeStats.nPrimorials.size() > 0) {
+	if (commandlineInput.initialPrimorial>0) { primeStats.nPrimorials.push_back(commandlineInput.initialPrimorial); }
+	if (commandlineInput.initialPrimorial2>0) { primeStats.nPrimorials.push_back(commandlineInput.initialPrimorial2); }
+	} else {
+	unsigned int pThreads;
+	if (commandlineInput.numThreads > 16) { pThreads = ceil(commandlineInput.numThreads / 6.0); } else { pThreads = ceil(commandlineInput.numThreads / 4.0); }
+	primeStats.nPrimorials.push_back(47);
+	if (pThreads > 1) { primeStats.nPrimorials.push_back(53); }
+	if (pThreads > 2) { primeStats.nPrimorials.push_back(59); }
+	if (pThreads > 3) { primeStats.nPrimorials.push_back(43); }
+	if (pThreads > 4) { primeStats.nPrimorials.push_back(61); }
+	if (pThreads > 5) { primeStats.nPrimorials.push_back(41); }
+	if (pThreads > 6) { primeStats.nPrimorials.push_back(67); }
+	if (pThreads > 7) { primeStats.nPrimorials.push_back(37); }
+	}
 	primeStats.nPrimorialsSize = primeStats.nPrimorials.size();
 	for (unsigned int i=0;i<primeStats.nPrimorialsSize;i++) {
 		primeStats.chainCounter2[primeStats.nPrimorials[i]][0] = 1;
@@ -1526,7 +1539,7 @@ int main(int argc, char **argv)
       printf("   GetWork() is outdated and inefficient. You are losing mining performance\n");
       printf("   by using it. If the pool supports it, consider switching to x.pushthrough.\n");
       printf("   Just add the port :10034 or 8081 to the -o parameter.\n");
-      printf("   Example: jhPrimeminer.exe -o http://poolurl.net:10034 ...\n");
+      printf("   Example: jhPrimeminer -o http://poolurl.net:10034 ...\n");
    }
 		// initial query new work / create new connection
    if( workData.protocolMode == MINER_PROTOCOL_GETWORK )
@@ -1538,10 +1551,7 @@ int main(int argc, char **argv)
 
 	// setup thread count and print info
 	nonceStep = commandlineInput.numThreads;
-	printf("Using %d threads\n", commandlineInput.numThreads);
-	printf("Username: %s\n", jsonRequestTarget.authUser);
-	printf("Password: %s\n", jsonRequestTarget.authPass);
-#define getFeeFromFloat(_x) ((uint16)((float)(_x)/0.002f)) // integer 1 = 0.002%
+	#define getFeeFromFloat(_x) ((uint16)((float)(_x)/0.002f)) // integer 1 = 0.002%
 		workData.xptClient = NULL;
 		workData.xptClient = xptClient_create();
 		if( workData.xptClient != NULL )
