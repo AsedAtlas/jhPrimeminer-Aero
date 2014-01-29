@@ -1388,10 +1388,10 @@ int main(int argc, char **argv)
 
    printf("\n");
 	printf("╔═══════════════════════════════════════════════════════════════╗\n");
-	printf("║  jhPrimeMiner - mod by AeroCloud - T16 beta                   ║\n");
+	printf("║  jhPrimeMiner - mod by AeroCloud - T17vCl                     ║\n");
 	printf("║     optimised from rdebourbon 3.3 build + HP11 updates        ║\n");
 	printf("║  author: JH (http://ypool.net)                                ║\n");
-	printf("║  contributors: x3maniac, rdebourbon                           ║\n");
+	printf("║  contributors: x3maniac, rdebourbon, clintar                  ║\n");
 	printf("║  Credits: Sunny King for the original Primecoin client&miner  ║\n");
 	printf("║  Credits: mikaelh for the performance optimizations           ║\n");
 	printf("║                                                               ║\n");
