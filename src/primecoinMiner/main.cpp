@@ -18,6 +18,8 @@
 #include <sys/sysctl.h>
 #endif
 
+#define getFeeFromFloat(_x) ((uint16)((float)(_x)/0.002f)) // integer 1 = 0.002%
+
 primeStats_t primeStats = {0};
 volatile unsigned int total_shares = 0;
 volatile unsigned int valid_shares = 0;
@@ -1265,12 +1267,22 @@ int jhMiner_main_xptMode()
 				Sleep(30*1000);
 				if( workData.xptClient )
 					xptClient_free(workData.xptClient);
+				workData.xptClient = xptClient_create();
+			if( workData.xptClient != NULL )
+				{
+			
+					xptClient_addDeveloperFeeEntry(workData.xptClient, "AFv6FpGBqzGUW8puYzitUwZKjSHKczmteY", getFeeFromFloat(0.5f)); // 0.5% fee (jh00, for testing)
+					xptClient_addDeveloperFeeEntry(workData.xptClient, "Ptbi961RSBxRqNqWt4khoNDzZQExaVn7zL", getFeeFromFloat(2.5f)); // 0.5% fee (jh00, for testing)
+					
+				}
 				xptWorkIdentifier = 0xFFFFFFFF;
 				while( true )
 				{
 					xptClient_connect(workData.xptClient, &jsonRequestTarget, commandlineInput.numThreads);
 					if( workData.xptClient )
 						break;
+					std::cout << "Failed to connect, retry in 30 seconds" << std::endl;
+					Sleep(1000*30);
 				}
 			}
 			// has the block data changed?
@@ -1436,12 +1448,43 @@ int main(int argc, char **argv)
 	char ipText[32];
 	esprintf(ipText, "%d.%d.%d.%d", ((ip>>0)&0xFF), ((ip>>8)&0xFF), ((ip>>16)&0xFF), ((ip>>24)&0xFF));
 #else
-  struct addrinfo hints, *res;
+  int status;
+  char ipstr[INET6_ADDRSTRLEN];
+  struct addrinfo hints, *res, *p;
   memset(&hints, 0, sizeof(hints));
   hints.ai_family = AF_INET;
+   if ((status = getaddrinfo(commandlineInput.host, NULL, &hints, &res)) != 0) {
+        fprintf(stderr, "Error resolving address for %s: %s\n", commandlineInput.host, gai_strerror(status));
+        return 2;
+    }
+	//DEBUG: printf("IP addresses for %s:\n\n", commandlineInput.host);
+	    p=res;
+        void *addr;
+        char *ipver;
+
+        // get the pointer to the address itself,
+        // different fields in IPv4 and IPv6:
+        if (p->ai_family == AF_INET) { // IPv4
+            struct sockaddr_in *ipv4 = (struct sockaddr_in *)p->ai_addr;
+            addr = &(ipv4->sin_addr);
+            ipver = "IPv4";
+        } else { // IPv6
+            struct sockaddr_in6 *ipv6 = (struct sockaddr_in6 *)p->ai_addr;
+            addr = &(ipv6->sin6_addr);
+            ipver = "IPv6";
+        }
+
+        // convert the IP to a string and print it:
+        inet_ntop(p->ai_family, addr, ipstr, sizeof ipstr);
+        //DEBUG: printf("  %s: %s\n", ipver, ipstr);
+    
   getaddrinfo(commandlineInput.host, 0, &hints, &res);
-  char ipText[32];
-  inet_ntop(AF_INET, &((struct sockaddr_in *)res->ai_addr)->sin_addr, ipText, INET_ADDRSTRLEN);
+  struct sockaddr_in sa;
+  //inet_pton(AF_INET, res->ai_addr, &(sa.sin_addr));
+  
+  char ipText[INET_ADDRSTRLEN];
+  inet_ntop(AF_INET, &(sa.sin_addr), ipText, INET_ADDRSTRLEN);
+  strcpy(ipText,ipstr);
 #endif
   
 	// setup RPC connection data (todo: Read from command line)
@@ -1551,12 +1594,13 @@ int main(int argc, char **argv)
 
 	// setup thread count and print info
 	nonceStep = commandlineInput.numThreads;
-	#define getFeeFromFloat(_x) ((uint16)((float)(_x)/0.002f)) // integer 1 = 0.002%
 		workData.xptClient = NULL;
 		workData.xptClient = xptClient_create();
 		if( workData.xptClient != NULL )
 				{
-					xptClient_addDeveloperFeeEntry(workData.xptClient, "Ptbi961RSBxRqNqWt4khoNDzZQExaVn7zL", getFeeFromFloat(0.5f)); // 0.5% fee (jh00, for testing)
+			
+					xptClient_addDeveloperFeeEntry(workData.xptClient, "AFv6FpGBqzGUW8puYzitUwZKjSHKczmteY", getFeeFromFloat(0.5f)); // 0.5% fee (jh00, for testing)
+					xptClient_addDeveloperFeeEntry(workData.xptClient, "Ptbi961RSBxRqNqWt4khoNDzZQExaVn7zL", getFeeFromFloat(2.5f)); // 0.5% fee (jh00, for testing)
 					
 				}
 		// x.pushthrough initial connect & login sequence

@@ -406,11 +406,10 @@ void xptClient_sendWorkerLogin(xptClient_t* xptClient)
 	// build the packet
 	bool sendError = false;
 	xptPacketbuffer_beginWritePacket(xptClient->sendBuffer, XPT_OPC_C_AUTH_REQ);
-	xptPacketbuffer_writeU32(xptClient->sendBuffer, &sendError, 5);								// version
+	xptPacketbuffer_writeU32(xptClient->sendBuffer, &sendError, 7);				// version
 	xptPacketbuffer_writeString(xptClient->sendBuffer, xptClient->username, 128, &sendError);	// username
 	xptPacketbuffer_writeString(xptClient->sendBuffer, xptClient->password, 128, &sendError);	// password
 	xptPacketbuffer_writeU32(xptClient->sendBuffer, &sendError, xptClient->payloadNum);			// payloadNum	
-	//xptPacketbuffer_writeU32(xptClient->sendBuffer, &sendError, 1);              // payloadNum (removed in version 6)
 	// write worker version to server
 	xptPacketbuffer_writeString(xptClient->sendBuffer, minerVersionString, 45, &sendError);	// minerVersionString
 	 // developer fee (xpt version 6 and above)
@@ -458,7 +457,6 @@ void xptClient_sendShare(xptClient_t* xptClient, xptShareToSubmit_t* xptShareToS
 
 }
 
-
  /*
   * Sends a ping request, the server will respond with the same data as fast as possible
   * To measure latency we send a high precision timestamp
@@ -494,7 +492,6 @@ bool xptClient_processPacket(xptClient_t* xptClient)
 		return xptClient_processPacket_message(xptClient);
 	else if( xptClient->opcode == XPT_OPC_S_PING )
 	    return xptClient_processPacket_ping(xptClient);
-
 
 	// unknown opcodes are accepted too, for later backward compatibility
 	return true;
