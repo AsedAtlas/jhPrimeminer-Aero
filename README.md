@@ -29,7 +29,7 @@ make
 
 Ubuntu:
 
-apt-get install build-essential libssl-dev openssl git libgmp libgmp-dev
+apt-get install build-essential libssl-dev openssl git libgmp-dev
 
 git clone https://github.com/clintar/jhPrimeminer-Aero.git
 
