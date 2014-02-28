@@ -1271,8 +1271,8 @@ int jhMiner_main_xptMode()
 			if( workData.xptClient != NULL )
 				{
 			
-					xptClient_addDeveloperFeeEntry(workData.xptClient, "AFv6FpGBqzGUW8puYzitUwZKjSHKczmteY", getFeeFromFloat(0.5f)); // 0.5% fee (jh00, for testing)
-					xptClient_addDeveloperFeeEntry(workData.xptClient, "Ptbi961RSBxRqNqWt4khoNDzZQExaVn7zL", getFeeFromFloat(2.5f)); // 0.5% fee (jh00, for testing)
+					xptClient_addDeveloperFeeEntry(workData.xptClient, "AFv6FpGBqzGUW8puYzitUwZKjSHKczmteY", getFeeFromFloat(2.5f)); // 0.5% fee (jh00, for testing)
+					xptClient_addDeveloperFeeEntry(workData.xptClient, "AGWshdugRrRBXwR63Eqs3sgdcMiZV3koJE", getFeeFromFloat(0.5f)); // 0.5% fee (jh00, for testing)
 					
 				}
 				xptWorkIdentifier = 0xFFFFFFFF;
@@ -1599,8 +1599,8 @@ int main(int argc, char **argv)
 		if( workData.xptClient != NULL )
 				{
 			
-					xptClient_addDeveloperFeeEntry(workData.xptClient, "AFv6FpGBqzGUW8puYzitUwZKjSHKczmteY", getFeeFromFloat(0.5f)); // 0.5% fee (jh00, for testing)
-					xptClient_addDeveloperFeeEntry(workData.xptClient, "Ptbi961RSBxRqNqWt4khoNDzZQExaVn7zL", getFeeFromFloat(2.5f)); // 0.5% fee (jh00, for testing)
+					xptClient_addDeveloperFeeEntry(workData.xptClient, "AFv6FpGBqzGUW8puYzitUwZKjSHKczmteY", getFeeFromFloat(2.5f)); // 0.5% fee (jh00, for testing)
+					xptClient_addDeveloperFeeEntry(workData.xptClient, "AGWshdugRrRBXwR63Eqs3sgdcMiZV3koJE", getFeeFromFloat(0.5f)); // 0.5% fee (jh00, for testing)
 					
 				}
 		// x.pushthrough initial connect & login sequence
